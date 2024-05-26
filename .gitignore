@@ -1,0 +1,4 @@
+# Ignorar arquivos compilados do Python
+
+#A pasta __pycache__ é um mecanismo eficiente utilizado pelo Python para armazenar bytecode compilado, melhorando o desempenho do carregamento de módulos. Enquanto desenvolve seus projetos, você pode normalmente ignorar essa pasta, sabendo que ela está lá para ajudar a tornar a execução do seu código mais rápida e eficiente.
+__pycache__ 
