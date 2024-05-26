@@ -16,7 +16,7 @@ cursor.execute(
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         nome VARCHAR(100) NOT NULL,
         cpf INTERGER UNIQUE NOT NULL,
-        address VARCHAR(250) NOT NULL 
+        address VARCHAR(250) NOT NULL
         )''')
 
 cursor.execute(
@@ -25,6 +25,7 @@ cursor.execute(
         type VARCHAR(50),
         num INTERGER(11) UNIQUE,
         id_client INTEGER,
+        saldo DECIMAL,
         FOREIGN KEY (id_client) REFERENCES clientes(id) )''')
 
 
@@ -41,10 +42,11 @@ def Insert_client(nome, cpf, address):
 
 
 def Insert_accout(type, num, idd_cliente):
-    data = type, num, idd_cliente
+    SALDO_INICIAL = 10.20
+    data = type, num, idd_cliente, SALDO_INICIAL
     try:
         cursor.execute(
-            "INSERT INTO account (type, num, id_client) VALUES (?,?,?)", data)
+            "INSERT INTO account (type, num, id_client, saldo) VALUES (?,?,?,?)", data)
         conexao.commit()
     except sqlite3.IntegrityError as e:
         print(f"Erro na operação: {e}")
@@ -62,4 +64,50 @@ def Recuperar_id_client(cpf):
         else:
             return None
     except Exception as e:
-        print(f"Erro tratado : {e}")
+        print(f"Erro tratado 1: {e}")
+
+
+def verficar_saldo(conta):
+    try:
+        cursor.execute('SELECT saldo FROM account WHERE num=?', (conta,))
+        result = cursor.fetchone()
+
+        if result:
+            return float(result[0])
+        else:
+            return None
+    except Exception as e:
+        print(f"Erro tratado 2: {e}")
+
+
+def depositar(valor, conta):
+    saldo = verficar_saldo(conta)
+    print(saldo)
+    if saldo != None:
+        atualizar = saldo + valor
+        print(atualizar)
+        data = atualizar, conta
+        print(conta)
+        try:
+            cursor.execute('UPDATE account SET saldo=? WHERE num=?', data)
+            conexao.commit()
+
+        except Exception as e:
+            print(f"Erro tratado 3: {e}")
+    else:
+        return None
+
+
+def sacar(valor, conta):
+    saldo = verficar_saldo(conta)
+    if saldo >= valor:
+        atualizar = saldo - valor
+        data = atualizar, conta
+        try:
+            cursor.execute('UPDATE account SET saldo=? WHERE num=?', data)
+            conexao.commit()
+        except Exception as e:
+            print(f"Erro tratado 4: {e}")
+    else:
+        return None
+    pass
